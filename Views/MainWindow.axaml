@@ -1,0 +1,215 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PacMan.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:PacMan.Controls;assembly=PacMan"
+        xmlns:conv="clr-namespace:PacMan.Converters"
+        x:Class="PacMan.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="PacMan"
+        Width="800"
+        Height="600"
+        Background="Black"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    <Window.Resources>
+        <conv:EqualsConverter x:Key="EqualsConverter"/>
+    </Window.Resources>
+    
+    <Grid>
+        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <!-- Pantalla de Inicio -->
+        <Grid IsVisible="{Binding CurrentScreen, Converter={StaticResource EqualsConverter}, ConverterParameter=StartScreen}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+                <TextBlock Text="PAC-MAN" 
+                          FontSize="64" 
+                          Foreground="Yellow" 
+                          FontWeight="Bold"
+                          HorizontalAlignment="Center"
+                          />
+                
+                <Button Content="Iniciar Juego" 
+                       FontSize="20"
+                       Width="200"
+                       Height="50"
+                       Background="Orange"
+                       Foreground="White"
+                       Command="{Binding StartGameCommand}"
+                       />
+                
+                <Button Content="Score Board" 
+                       FontSize="20"
+                       Width="200"
+                       Height="50"
+                       Background="Orange"
+                       Foreground="White"
+                       Command="{Binding ShowScoreboardCommand}"/>
+                
+                <Button Content="Salir" 
+                       FontSize="20"
+                       Width="200"
+                       Height="50"
+                       Background="Orange"
+                       Foreground="White"
+                       Command="{Binding ExitCommand}"/>
+            </StackPanel>
+            
+            <Button Content="{Binding MuteButtonText}"
+                   FontSize="16"
+                   Width="50"
+                   Height="40"
+                   Background="Gray"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Top"
+                   Margin="20"
+                   Command="{Binding ToggleMuteCommand}"/>
+        </Grid>
+
+
+        <Grid IsVisible="{Binding CurrentScreen, Converter={StaticResource EqualsConverter}, ConverterParameter=GameScreen}">
+            <StackPanel>
+                <!-- UI del juego -->
+                <Grid Height="40" Background="Black">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0">
+                        <TextBlock Text="Puntuación: " Foreground="Yellow" FontSize="18"/>
+                        <TextBlock Text="{Binding ScoreText}" Foreground="Yellow" FontSize="18"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="20,0">
+                        <TextBlock Text="Vidas: " Foreground="Yellow" FontSize="18"/>
+                        <TextBlock Text="{Binding LivesText}" Foreground="Yellow" FontSize="18"/>
+                    </StackPanel>
+                </Grid>
+                
+                <!-- Canvas del juego -->
+                <Border BorderBrush="Blue" BorderThickness="3">
+                    <Grid>
+                        <controls:GameCanvas x:Name="GameCanvasControl"
+                                           Width="760"
+                                           Height="540"
+                                           GameEngine="{Binding GameEngine}"/>
+                        
+                        <!-- Botón de salir durante el juego -->
+                        <Button Content="Salir"
+                               FontSize="14"
+                               Width="60"
+                               Height="30"
+                               Background="Red"
+                               Foreground="White"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Top"
+                               Margin="10"
+                               Command="{Binding BackToMenuCommand}"/>
+                    </Grid>
+                </Border>
+            </StackPanel>
+            
+            <!-- Modal Game Over -->
+            <Border IsVisible="{Binding GameOverVisible}"
+                   Background="#CC000000"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Padding="40"
+                   CornerRadius="15"
+                   BorderBrush="Red"
+                   BorderThickness="3">
+                <StackPanel Spacing="20">
+                    <TextBlock Text="GAME OVER" 
+                              FontSize="36" 
+                              Foreground="Red" 
+                              FontWeight="Bold"
+                              HorizontalAlignment="Center"/>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                        <TextBlock Text="Puntuación Final: " Foreground="White" FontSize="18"/>
+                        <TextBlock Text="{Binding FinalScore}" Foreground="Yellow" FontSize="18"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                        <Button Content="Reiniciar" 
+                               FontSize="16"
+                               Width="120"
+                               Height="40"
+                               Background="Orange"
+                               Foreground="White"
+                               Command="{Binding RestartGameCommand}"/>
+                        
+                        <Button Content="Menú Principal" 
+                               FontSize="16"
+                               Width="120"
+                               Height="40"
+                               Background="Orange"
+                               Foreground="White"
+                               Command="{Binding BackToMenuCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+         <!-- Pantalla de Puntuaciones -->
+        <Grid IsVisible="{Binding CurrentScreen, Converter={StaticResource EqualsConverter}, ConverterParameter=ScoreScreen}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+                <Border Background="#1A1A1A" 
+                       Padding="20" 
+                       CornerRadius="10" 
+                       Width="400">
+                    <StackPanel Spacing="15">
+                        <TextBlock Text="🏆 TABLA DE PUNTUACIONES" 
+                                  FontSize="24" 
+                                  Foreground="Yellow" 
+                                  FontWeight="Bold"
+                                  HorizontalAlignment="Center"/>
+                        
+                        <Border Background="#333" Padding="10,5" CornerRadius="5">
+                            <Grid>
+                                <TextBlock Text="1. JUGADOR A" Foreground="White" HorizontalAlignment="Left"/>
+                                <TextBlock Text="15,420" Foreground="White" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Border>
+                        
+                        <Border Background="#333" Padding="10,5" CornerRadius="5">
+                            <Grid>
+                                <TextBlock Text="2. JUGADOR B" Foreground="White" HorizontalAlignment="Left"/>
+                                <TextBlock Text="12,850" Foreground="White" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Border>
+                        
+                        <Border Background="#333" Padding="10,5" CornerRadius="5">
+                            <Grid>
+                                <TextBlock Text="3. JUGADOR C" Foreground="White" HorizontalAlignment="Left"/>
+                                <TextBlock Text="9,760" Foreground="White" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Border>
+                        
+                        <Border Background="#333" Padding="10,5" CornerRadius="5">
+                            <Grid>
+                                <TextBlock Text="4. JUGADOR D" Foreground="White" HorizontalAlignment="Left"/>
+                                <TextBlock Text="8,340" Foreground="White" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Border>
+                        
+                        <Border Background="#333" Padding="10,5" CornerRadius="5">
+                            <Grid>
+                                <TextBlock Text="5. JUGADOR E" Foreground="White" HorizontalAlignment="Left"/>
+                                <TextBlock Text="6,920" Foreground="White" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+                
+                <Button Content="Volver al Menú" 
+                       FontSize="20"
+                       Width="200"
+                       Height="50"
+                       Background="Orange"
+                       Foreground="White"
+                       Command="{Binding BackToMenuCommand}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
+
